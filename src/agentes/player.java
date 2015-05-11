@@ -152,11 +152,13 @@ public class player extends Agent  {
             if(!jugando){
                 ACLMessage agree = propuesta.createReply();
                 agree.setPerformative(ACLMessage.ACCEPT_PROPOSAL);
-                jugando = true;
+                inicializar();
                 return agree;
             }else{
                 //Rechazo de la propuesta.
                 //Se crea la respuesta al mensaje con la performativa REJECT_PROPOSAL, pues se rechaza.
+                jugando = true;
+                reset();
                 ACLMessage refuse = propuesta.createReply();
                 refuse.setPerformative(ACLMessage.REJECT_PROPOSAL);
  
