@@ -194,7 +194,6 @@ public class player extends Agent  {
         protected ACLMessage handleCfp(ACLMessage cfp) throws NotUnderstoodException, RefuseException {
             ACLMessage resp = cfp.createReply();
             resp.setPerformative(ACLMessage.PROPOSE);  
-            System.out.print("Pinicio PrepareResponse\n");
             try {
                 FichaEntregada fe = null;
                 Action a = (Action) manager.extractContent(cfp);
@@ -204,14 +203,14 @@ public class player extends Agent  {
                     tablero[pedir.getAnterior().getPosicion().getFila()][pedir.getAnterior().getPosicion().getColumna()] = true;
                     quatro.elementos.Ficha f = pedir.getAnterior().getFicha();
                     Ficha fich = new Ficha(f.getColor(),f.getForma(),f.getAltura(),f.getEstado());
-                    System.out.print("Registrando ficha del movimiento anterior: " + fich.toACL() + "\n");
+                    //System.out.print("Registrando ficha del movimiento anterior: " + fich.toACL() + "\n");
                     registrarFicha(fich.toACL());
                 }
                     
                 if(!(pedir.getJugadorActivo().getJugador().equals(myAgent.getAID()))){
                      Ficha fich = new Ficha(selectFicha());
                      quatro.elementos.Ficha f = new quatro.elementos.Ficha(fich.getColor(),fich.getForma(),fich.getAltura(),fich.getEstado());
-                     System.out.print("[Pasivo] Enviando ficha: " + fich.toACL() + "\n");
+                     //System.out.print("[Pasivo] Enviando ficha: " + fich.toACL() + "\n");
                      Victoria v = new Victoria(false);
                      fe = new FichaEntregada(f, v);
                 }else{
@@ -222,7 +221,6 @@ public class player extends Agent  {
 
             } catch (Codec.CodecException | OntologyException ex) {
             }
-            System.out.print("Fin PrepareResponse " + resp.getContent() + "\n");
             return resp;
        }
     
@@ -243,7 +241,6 @@ public class player extends Agent  {
        protected ACLMessage prepareResultNotification(ACLMessage cfp, ACLMessage propose, ACLMessage accept) throws FailureException {
            /*Aquí ponemos el Movimiento realizado y eso*/     
            ACLMessage inform = accept.createReply();
-           System.out.print("prepareResultNotification \n");
             inform.setPerformative(ACLMessage.INFORM);
             PedirMovimiento fe = null;
             AbsPredicate cs = null;
@@ -274,7 +271,6 @@ public class player extends Agent  {
             } catch (Codec.CodecException | OntologyException ex) {
                 Logger.getLogger(player.class.getName()).log(Level.SEVERE, null, ex);
             }
-           System.out.print("fin de prepareResultNotification" + inform.getContent() + " \n");
             return inform;
         }
     }

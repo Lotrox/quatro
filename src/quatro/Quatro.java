@@ -191,11 +191,13 @@ public class Quatro extends Agent{
                
                 if(mensaje.getPerformative() == ACLMessage.PROPOSE){
                     try {
-                        AbsPredicate cs = (AbsPredicate)myAgent.getContentManager().extractAbsContent(mensaje);
-                        Ontology o = myAgent.getContentManager().lookupOntology(OntologiaQuatro.ONTOLOGY_NAME);
-                        FichaEntregada fe = (FichaEntregada)o.toObject((AbsObject)cs);
-                        saveFicha = new quatro.elementos.Ficha(fe.getFicha().getColor(),fe.getFicha().getForma(),fe.getFicha().getAltura(),fe.getFicha().getEstado());
-                        ACLMessage respuesta = mensaje.createReply();
+                        System.out.print("Handle all responsees PROPOSE \n");
+                        FichaEntregada fe = (FichaEntregada)manager.extractContent(mensaje);
+                        System.out.print(fe.getFicha());
+                        //if(fe.getFicha().getAltura() != 0){ Comprobar caracteristica
+                            saveFicha = new quatro.elementos.Ficha(fe.getFicha().getColor(),fe.getFicha().getForma(),fe.getFicha().getAltura(),fe.getFicha().getEstado());
+                        //}
+                            ACLMessage respuesta = mensaje.createReply();
                         respuesta.setPerformative(ACLMessage.ACCEPT_PROPOSAL); /*Aqui enviar peticion de movimiento*/
                         PedirMovimiento pm = new PedirMovimiento(participantes[turno], partida, saveFicha);
                         getContentManager().fillContent(respuesta, pm);
