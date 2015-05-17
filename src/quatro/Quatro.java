@@ -196,20 +196,20 @@ public class Quatro extends Agent{
                     try {
                         System.out.print("Handle all responsees PROPOSE \n");
                         FichaEntregada fe = (FichaEntregada) manager.extractContent(mensaje);
-                        if (fe.getVictoria() == null) {
+                        if ((fe.getFicha().getColor() != 0) && (fe.getFicha().getForma() != 0) && (fe.getFicha().getAltura() != 0) && (fe.getFicha().getEstado() != 0)) {
                             System.out.print("Guardando ficha\n");
                             //saveFicha = new quatro.elementos.Ficha(fe.getFicha().getColor(), fe.getFicha().getForma(), fe.getFicha().getAltura(), fe.getFicha().getEstado());
                             saveFicha = fe.getFicha();
-                             quatro.Ficha f = new quatro.Ficha(fe.getFicha().getColor(), fe.getFicha().getForma(), fe.getFicha().getAltura(), fe.getFicha().getEstado());
+                            quatro.Ficha f = new quatro.Ficha(fe.getFicha().getColor(), fe.getFicha().getForma(), fe.getFicha().getAltura(), fe.getFicha().getEstado());
                             gui.log.setText(gui.jE  + " ha enviado la pieza "+ f.toACL() +"\n" + gui.log.getText());
                             System.out.print("Ficha: " + fe.getFicha().getColor());
                             ficha = mensaje.createReply();
                             System.out.print(mensaje.getContent() + "\n");
-                            PedirMovimiento pm = new PedirMovimiento(participantes[turno], partida, saveFicha);
-                            Action a = new Action();
-                            a.setAction(pm);
-                            a.setActor(pm.getJugador().getJugador());
-                            manager.fillContent(ficha, a);
+//                            PedirMovimiento pm = new PedirMovimiento(participantes[turno], partida, saveFicha);
+//                            Action a = new Action();
+//                            a.setAction(pm);
+//                            a.setActor(pm.getJugador().getJugador());
+//                            manager.fillContent(ficha, a);
                             ficha.setPerformative(ACLMessage.REJECT_PROPOSAL); /*Aqui enviar peticion de movimiento*/
                             aceptados.add(ficha);
                         } else {
@@ -223,7 +223,7 @@ public class Quatro extends Agent{
                 }
             }
             
-            if(saveFicha != null){
+            if(saveFicha != null && movimiento != null){
                 try {
                     movimiento.setSender(getAID());
                     movimiento.setReplyByDate(new Date(System.currentTimeMillis() + 10000));
@@ -277,7 +277,6 @@ public class Quatro extends Agent{
             Ontology o = myAgent.getContentManager().lookupOntology(OntologiaQuatro.ONTOLOGY_NAME);
             try {
                 fe = (MovimientoRealizado)o.toObject((AbsObject)cs);
-                movAnterior = fe.getMovimiento();
                 System.out.println(fe.getMovimiento() + "\n");
             } catch (OntologyException ex) {
                 Logger.getLogger(Quatro.class.getName()).log(Level.SEVERE, null, ex);
@@ -286,6 +285,7 @@ public class Quatro extends Agent{
                 quatro.elementos.Ficha fi = fe.getMovimiento().getFicha();
                 quatro.Ficha f = new quatro.Ficha(fi.getColor(), fi.getForma(), fi.getAltura(), fi.getEstado());
                 gui.movimiento(fe.getMovimiento().getPosicion().getFila(), fe.getMovimiento().getPosicion().getColumna(), f, false);
+                movAnterior = fe.getMovimiento();
                 
             }
             
@@ -325,9 +325,9 @@ public class Quatro extends Agent{
             }
             
             if(j1 && j2){
-                Juego juego = new Juego(OntologiaQuatro.TIPO_JUEGO);
-                partida = new Partida("PARTIDA DE PRUEBA",juego);
-                IniciarPartida jugar = new IniciarPartida(partida, getAID());
+              //  Juego juego = new Juego(OntologiaQuatro.TIPO_JUEGO);
+              //  partida = new Partida("PARTIDA DE PRUEBA",juego);
+              //  IniciarPartida jugar = new IniciarPartida(partida, getAID());
                 gui.log.setText("\n¡COMIENZA PARTIDA ENTRE " + gui.jE + " y " + gui.jT + "!\n\n" + gui.log.getText());          
                 comenzarTurno();
             }
@@ -388,10 +388,21 @@ public class Quatro extends Agent{
             }else{
                 System.out.print("FIN busqueda jugadores \n");
                 ACLMessage mensaje = new ACLMessage(ACLMessage.PROPOSE);
-                mensaje.setOntology(ontologia.getName());
                 mensaje.setProtocol(FIPANames.InteractionProtocol.FIPA_PROPOSE);
-                mensaje.setLanguage(codec.getName());
                 mensaje.setReplyByDate(new Date(System.currentTimeMillis() + 10000));
+                mensaje.setOntology(ontologia.getName());
+                mensaje.setLanguage(codec.getName());
+                
+                Juego juego = new Juego(OntologiaQuatro.TIPO_JUEGO);
+                partida = new Partida(String.valueOf(System.currentTimeMillis()), juego);
+                IniciarPartida start = new IniciarPartida(partida, getAID());
+                Action a = new Action(getAID(), start);
+                
+                try {
+                    manager.fillContent(mensaje, a);
+                } catch (Codec.CodecException | OntologyException ex) {
+                    Logger.getLogger(Quatro.class.getName()).log(Level.SEVERE, null, ex);
+                }
                 //Se añade el destinatario.
                 participantes[0] = new Jugador(jugadores[0].getName());
                 participantes[1] = new Jugador(jugadores[1].getName());
