@@ -145,7 +145,7 @@ public class Quatro extends Agent{
         ACLMessage mensajeCFP = new ACLMessage(ACLMessage.CFP);
        
         mensajeCFP.addReceiver(participantes[0].getJugador());
-        if(movAnterior != null) mensajeCFP.addReceiver(participantes[1].getJugador());
+        mensajeCFP.addReceiver(participantes[1].getJugador());
         //Protocolo que vamos a utilizar
         
         mensajeCFP.setSender(getAID());
@@ -154,8 +154,10 @@ public class Quatro extends Agent{
          
         mensajeCFP.setLanguage(codec.getName());
         mensajeCFP.setOntology(ontologia.getName());
-        turno = 1;
-        if(gui.jT.equals(participantes[0].getJugador())) turno = 0;
+        gui.turno.setText(participantes[turno].getJugador().getLocalName());
+        if(turno == 0) turno = 1;
+        else turno = 0; 
+        System.out.println("Jugador activo: " + participantes[turno].getJugador() + "\n");
        PedirFicha pedirFicha = new PedirFicha(partida, participantes[turno], movAnterior);   
        Action a = new Action(getAID(), pedirFicha);
        
@@ -179,54 +181,83 @@ public class Quatro extends Agent{
         }
         
         @Override /*Manejador de respuestas de los agentes.*/
-        protected void handleAllResponses(Vector respuestas, Vector aceptados){
+        protected void handleAllResponses(Vector respuestas, Vector aceptados) {
+            System.out.println("Timeout agotado: perdidos " + (respuestas.size()) + " participantes");
             ACLMessage ficha = null, movimiento = null;
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException ex) {
                 Logger.getLogger(Quatro.class.getName()).log(Level.SEVERE, null, ex);
             }
-            for (Object resp:respuestas) {
+            for (Object resp : respuestas) {
                 ACLMessage mensaje = (ACLMessage) resp;
-               
-                if(mensaje.getPerformative() == ACLMessage.PROPOSE){
+
+                if (mensaje.getPerformative() == ACLMessage.PROPOSE) {
                     try {
                         System.out.print("Handle all responsees PROPOSE \n");
-                        FichaEntregada fe = (FichaEntregada)manager.extractContent(mensaje);
-                        System.out.print(fe.getFicha());
-                        //if(fe.getFicha().getAltura() != 0){ Comprobar caracteristica
-                            saveFicha = new quatro.elementos.Ficha(fe.getFicha().getColor(),fe.getFicha().getForma(),fe.getFicha().getAltura(),fe.getFicha().getEstado());
-                        //}
-                            ACLMessage respuesta = mensaje.createReply();
-                        respuesta.setPerformative(ACLMessage.ACCEPT_PROPOSAL); /*Aqui enviar peticion de movimiento*/
-                        PedirMovimiento pm = new PedirMovimiento(participantes[turno], partida, saveFicha);
-                        getContentManager().fillContent(respuesta, pm);
-                        aceptados.add(respuesta);
+                        FichaEntregada fe = (FichaEntregada) manager.extractContent(mensaje);
+                        if (fe.getVictoria() == null) {
+                            System.out.print("Guardando ficha\n");
+                            //saveFicha = new quatro.elementos.Ficha(fe.getFicha().getColor(), fe.getFicha().getForma(), fe.getFicha().getAltura(), fe.getFicha().getEstado());
+                            saveFicha = fe.getFicha();
+                             quatro.Ficha f = new quatro.Ficha(fe.getFicha().getColor(), fe.getFicha().getForma(), fe.getFicha().getAltura(), fe.getFicha().getEstado());
+                            gui.log.setText(gui.jE  + " ha enviado la pieza "+ f.toACL() +"\n" + gui.log.getText());
+                            System.out.print("Ficha: " + fe.getFicha().getColor());
+                            ficha = mensaje.createReply();
+                            System.out.print(mensaje.getContent() + "\n");
+                            PedirMovimiento pm = new PedirMovimiento(participantes[turno], partida, saveFicha);
+                            Action a = new Action();
+                            a.setAction(pm);
+                            a.setActor(pm.getJugador().getJugador());
+                            manager.fillContent(ficha, a);
+                            ficha.setPerformative(ACLMessage.REJECT_PROPOSAL); /*Aqui enviar peticion de movimiento*/
+                            aceptados.add(ficha);
+                        } else {
+                            movimiento = mensaje.createReply(); 
+                        }
+
                     } catch (Codec.CodecException | OntologyException ex) {
                         Logger.getLogger(Quatro.class.getName()).log(Level.SEVERE, null, ex);
-                    }       
-                }else{
-                    ACLMessage respuesta = mensaje.createReply();
-                    respuesta.setPerformative(ACLMessage.REJECT_PROPOSAL);
-                    aceptados.add(respuesta);
+                    }
+
                 }
             }
-             if(saveFicha != null && movimiento != null){
-                        ACLMessage respuesta = movimiento.createReply();
-                        respuesta.setPerformative(ACLMessage.ACCEPT_PROPOSAL);
-                        respuesta.setContent(ficha.getContent());
-                        aceptados.add(respuesta);
-                        
-                        respuesta = ficha.createReply();
-                        respuesta.setPerformative(ACLMessage.REJECT_PROPOSAL);
-                        aceptados.add(respuesta);
+            
+            if(saveFicha != null){
+                try {
+                    movimiento.setSender(getAID());
+                    movimiento.setReplyByDate(new Date(System.currentTimeMillis() + 10000));
+                    PedirMovimiento pm = new PedirMovimiento(participantes[turno], partida, saveFicha);
+                    System.out.println("Pidiendo ficha" + saveFicha.getColor() + "\n");
+                    Action a = new Action(participantes[turno].getJugador(), pm);
+                    manager.fillContent(movimiento, a);
+                    System.out.println("ASD: " + pm.getJugador().getJugador() + "\n");
+                    System.out.print(movimiento.getContent() + "\n");
+                    movimiento.setPerformative(ACLMessage.ACCEPT_PROPOSAL);
+                    aceptados.add(movimiento);
+                } catch (Codec.CodecException | OntologyException ex) {
+                    Logger.getLogger(Quatro.class.getName()).log(Level.SEVERE, null, ex);
                 }
+            }
+
+//             if(saveFicha != null){
+//                 System.out.println("Añadiendo contenido de ficha\n");
+//                        ACLMessage respuesta = movimiento.createReply();
+//                        respuesta.setPerformative(ACLMessage.ACCEPT_PROPOSAL);
+//                        
+//                        respuesta.setContent(ficha.getContent());
+//                        aceptados.add(respuesta);
+//                        
+//                        respuesta = ficha.createReply();
+//                        respuesta.setPerformative(ACLMessage.REJECT_PROPOSAL);
+//                        aceptados.add(respuesta);
+//                }
         }
 
         @Override
         protected void handleInform(ACLMessage inform) {
             gui.estado = 1;
-           
+            System.out.print("HOLAAA \n");
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException ex) {
@@ -246,14 +277,15 @@ public class Quatro extends Agent{
             Ontology o = myAgent.getContentManager().lookupOntology(OntologiaQuatro.ONTOLOGY_NAME);
             try {
                 fe = (MovimientoRealizado)o.toObject((AbsObject)cs);
+                movAnterior = fe.getMovimiento();
+                System.out.println(fe.getMovimiento() + "\n");
             } catch (OntologyException ex) {
                 Logger.getLogger(Quatro.class.getName()).log(Level.SEVERE, null, ex);
             }
-            if(fe.getMovimiento().getPosicion()!= null){
+            if(fe.getMovimiento() != null){
                 quatro.elementos.Ficha fi = fe.getMovimiento().getFicha();
                 quatro.Ficha f = new quatro.Ficha(fi.getColor(), fi.getForma(), fi.getAltura(), fi.getEstado());
-                gui.log.setText(gui.jE  + " ha enviado la pieza "+ f.toACL() +"\n" + gui.log.getText());
-                gui.movimiento(fe.getMovimiento().getPosicion().getFila()+1, fe.getMovimiento().getPosicion().getColumna()+1, f, false);
+                gui.movimiento(fe.getMovimiento().getPosicion().getFila(), fe.getMovimiento().getPosicion().getColumna(), f, false);
                 
             }
             
@@ -325,7 +357,7 @@ public class Quatro extends Agent{
                 receptor.addServices(servicio);
                 
                 SearchConstraints sc = new SearchConstraints();
-                sc.setMaxResults(new Long(4)); /*Busca como máximo 4*/
+                //sc.setMaxResults(new Long(4)); /*Busca como máximo 4*/
             
                 try {
                     jugadores = DFService.search(this.myAgent, receptor);
@@ -356,9 +388,10 @@ public class Quatro extends Agent{
             }else{
                 System.out.print("FIN busqueda jugadores \n");
                 ACLMessage mensaje = new ACLMessage(ACLMessage.PROPOSE);
-                mensaje.setOntology(OntologiaQuatro.ONTOLOGY_NAME);
+                mensaje.setOntology(ontologia.getName());
                 mensaje.setProtocol(FIPANames.InteractionProtocol.FIPA_PROPOSE);
                 mensaje.setLanguage(codec.getName());
+                mensaje.setReplyByDate(new Date(System.currentTimeMillis() + 10000));
                 //Se añade el destinatario.
                 participantes[0] = new Jugador(jugadores[0].getName());
                 participantes[1] = new Jugador(jugadores[1].getName());

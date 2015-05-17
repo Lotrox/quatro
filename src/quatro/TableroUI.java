@@ -110,7 +110,7 @@ public class TableroUI extends javax.swing.JFrame {
             try {
                 pos[x][y].setIcon(f.pintar()); //Dibujar pieza.
                 fichas[x][y] = f;
-                turno.setText(jT);
+                //turno.setText(jT);
                 
             } catch (IOException ex) {
                 Logger.getLogger(TableroUI.class.getName()).log(Level.SEVERE, null, ex);
@@ -630,7 +630,7 @@ public class TableroUI extends javax.swing.JFrame {
     private javax.swing.JButton pos7;
     private javax.swing.JButton pos8;
     private javax.swing.JButton pos9;
-    private javax.swing.JLabel turno;
+    public javax.swing.JLabel turno;
     // End of variables declaration//GEN-END:variables
 
     private static class PosicionIlegal extends Exception {

@@ -203,16 +203,16 @@ public class player extends Agent  {
                     tablero[pedir.getAnterior().getPosicion().getFila()][pedir.getAnterior().getPosicion().getColumna()] = true;
                     quatro.elementos.Ficha f = pedir.getAnterior().getFicha();
                     Ficha fich = new Ficha(f.getColor(),f.getForma(),f.getAltura(),f.getEstado());
-                    //System.out.print("Registrando ficha del movimiento anterior: " + fich.toACL() + "\n");
+                    System.out.print("Registrando ficha del movimiento anterior: " + fich.toACL() + "\n");
                     registrarFicha(fich.toACL());
                 }
                     
                 if(!(pedir.getJugadorActivo().getJugador().equals(myAgent.getAID()))){
                      Ficha fich = new Ficha(selectFicha());
                      quatro.elementos.Ficha f = new quatro.elementos.Ficha(fich.getColor(),fich.getForma(),fich.getAltura(),fich.getEstado());
-                     //System.out.print("[Pasivo] Enviando ficha: " + fich.toACL() + "\n");
+                     System.out.print(myAgent.getAID() + "[Pasivo] Enviando ficha: " + fich.toACL() + "\n");
                      Victoria v = new Victoria(false);
-                     fe = new FichaEntregada(f, v);
+                     fe = new FichaEntregada(f, null);
                 }else{
                     Victoria v = new Victoria(false);
                     fe = new FichaEntregada(new quatro.elementos.Ficha(), v);
@@ -240,37 +240,36 @@ public class player extends Agent  {
         @Override
        protected ACLMessage prepareResultNotification(ACLMessage cfp, ACLMessage propose, ACLMessage accept) throws FailureException {
            /*Aquí ponemos el Movimiento realizado y eso*/     
-           ACLMessage inform = accept.createReply();
+           System.out.print("PLAYER PREPARE  RESULT NOTIF \n");
+           System.out.println("JUGADOR " + myAgent.getLocalName() + "\n");
+            ACLMessage inform = accept.createReply();
             inform.setPerformative(ACLMessage.INFORM);
             PedirMovimiento fe = null;
-            AbsPredicate cs = null;
             try {
-                cs = (AbsPredicate)myAgent.getContentManager().extractAbsContent(propose);
                 Action a = (Action) manager.extractContent(accept);
                 fe = (PedirMovimiento)a.getAction();
+                
             } catch (Codec.CodecException | OntologyException ex) {
                 Logger.getLogger(player.class.getName()).log(Level.SEVERE, null, ex);
             }
             Ontology o = myAgent.getContentManager().lookupOntology(OntologiaQuatro.ONTOLOGY_NAME);
-//            try {
-//                fe = (PedirMovimiento)o.toObject((AbsObject)cs);
-//            } catch (OntologyException ex) {
-//                Logger.getLogger(player.class.getName()).log(Level.SEVERE, null, ex);
-//            }
-//            
-            
-            String[] posxy = colocarFicha().split(";");
-            Jugador j = fe.getJugador();
-            Posicion p = new Posicion(Integer.parseInt(posxy[0]),Integer.parseInt(posxy[1]));
-            Movimiento m = new Movimiento(fe.getFicha(), p);
-            Victoria v = new Victoria(false);
-            MovimientoRealizado mr = new MovimientoRealizado(j, m);
-            mr.setVictoria(v);
-            try {
-                getContentManager().fillContent(inform,mr);
-            } catch (Codec.CodecException | OntologyException ex) {
-                Logger.getLogger(player.class.getName()).log(Level.SEVERE, null, ex);
+           
+            if(fe != null){
+                System.out.println("JUGADOR " + myAgent.getLocalName() + fe.getFicha().getAltura() + "\n");
+                String[] posxy = colocarFicha().split(";");
+                Jugador j = fe.getJugador();
+                Posicion p = new Posicion(Integer.parseInt(posxy[0]),Integer.parseInt(posxy[1]));
+                Movimiento m = new Movimiento(fe.getFicha(), p);
+                Victoria v = new Victoria(false);
+                MovimientoRealizado mr = new MovimientoRealizado(j, m);
+                mr.setVictoria(v);
+                try {
+                    getContentManager().fillContent(inform,mr);
+                } catch (Codec.CodecException | OntologyException ex) {
+                    Logger.getLogger(player.class.getName()).log(Level.SEVERE, null, ex);
+                }     
             }
+            System.out.print("INFORM: " + inform.getContent() + "\n");
             return inform;
         }
     }
