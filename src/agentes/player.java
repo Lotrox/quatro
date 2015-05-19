@@ -5,7 +5,7 @@
  */
 
 /*-gui Tablero:quatro.Tablero;Jugador1:agentes.player;Jugador2:agentes.player*/
-/*java -cp "Desktop\Quatro 30-4\lib\jade.jar" -jar "Desktop\Quatro 30-4\MULTIAGENTES_QUATRO.jar" -gui*/
+/*java -cp "Desktop\Quatro 30-4\lib\jade.jar" -jar "Desktop\Quatro 30-4\MULTIAGENTE_QUATRO.jar" -gui*/
 
 package agentes;
 
