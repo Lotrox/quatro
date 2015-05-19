@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-/*-gui Tablero:quatro.Quatro;Jugador1:agentes.player;Jugador2:agentes.player*/
+/*-gui Tablero:quatro.Tablero;Jugador1:agentes.player;Jugador2:agentes.player*/
 /*java -cp "Desktop\Quatro 30-4\lib\jade.jar" -jar "Desktop\Quatro 30-4\MULTIAGENTES_QUATRO.jar" -gui*/
 
 package agentes;

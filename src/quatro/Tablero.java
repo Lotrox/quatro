@@ -7,7 +7,6 @@
 /*-container -host 192.168.38.100 Dani:agentes.player*/
 package quatro;
 
-import jade.content.ContentElement;
 import jade.content.ContentManager;
 import jade.content.abs.AbsObject;
 import jade.content.abs.AbsPredicate;
@@ -46,7 +45,7 @@ import quatro.elementos.PedirMovimiento;
  *
  * @author Lotrox
  */
-public class Quatro extends Agent{
+public class Tablero extends Agent{
 
     /**
      * @param args the command line arguments
@@ -57,8 +56,6 @@ public class Quatro extends Agent{
     private Boolean j1, j2;
     private Jugador[] participantes = new Jugador[2];
     private quatro.elementos.Ficha saveFicha;
-    private quatro.elementos.Ficha ficha;
-    private int saveX, saveY;
     private Partida partida;
     private Movimiento movAnterior = null;
     private final ContentManager manager = (ContentManager) getContentManager();
@@ -73,12 +70,12 @@ public class Quatro extends Agent{
         try {
             OntologiaQuatro.getInstance();
         } catch (BeanOntologyException ex) {
-            Logger.getLogger(Quatro.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Tablero.class.getName()).log(Level.SEVERE, null, ex);
         }
         try {
             ontologia = OntologiaQuatro.getInstance();
         } catch (BeanOntologyException ex) {
-            Logger.getLogger(Quatro.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Tablero.class.getName()).log(Level.SEVERE, null, ex);
         }
         manager.registerLanguage(codec);
 	manager.registerOntology(ontologia);
@@ -102,7 +99,7 @@ public class Quatro extends Agent{
         try {
             DFService.register(this, descripcion); //
         } catch (FIPAException ex) {
-            Logger.getLogger(Quatro.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Tablero.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         this.addBehaviour(new BuscarJugadores());
@@ -120,26 +117,27 @@ public class Quatro extends Agent{
             DFService.deregister(this);
             System.out.println("Agente " + getAID().getName() + " finalizado." + "\n");
         } catch (FIPAException ex) {
-            Logger.getLogger(Quatro.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Tablero.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
     public void comenzarTurno(){ 
-        gui.log.setText("--------------------------------------------------------------------------------------------" +"\n" + gui.log.getText()); 
+        gui.log.setText("------------------------------------------------------------------------------------------------------" +"\n" + gui.log.getText()); 
         for(int i=0;i<4;i++){
             for(int j=0;j<4;j++){
                 if(gui.fichas[i][j] == null) break;
                 if(i == 3 && j == 3){
-                    gui.estado = 2;
-                    gui.log.setText("A modo de prueba se comprobará ganador... \nPartida finalizada con empate. \n "+ gui.log.getText());      
+                    gui.estado = 2;   
+                    gui.jLabel1.setText("EMPATE!");
+                    gui.log.setText(gui.log.getText() + gui.jT+ " y " + gui.jE + " han empatado la partida.\n" + gui.log.getText());
                     try {
-                        Thread.sleep(1800);
+                        Thread.sleep(1000);
                     } catch (InterruptedException ex) {
-                        Logger.getLogger(Quatro.class.getName()).log(Level.SEVERE, null, ex);
+                        Logger.getLogger(Tablero.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                    gui.compruebaGanador();
-                    this.blockingReceive();
-                }
+                    gui.reset();
+                    this.addBehaviour(new BuscarJugadores());      
+                    }
             }
         }
         ACLMessage mensajeCFP = new ACLMessage(ACLMessage.CFP);
@@ -164,7 +162,7 @@ public class Quatro extends Agent{
         try {
             manager.fillContent(mensajeCFP, a);
         } catch (Codec.CodecException | OntologyException ex) {
-            Logger.getLogger(Quatro.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Tablero.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         //Se añade el comportamiento que manejará las ofertas.
@@ -185,9 +183,9 @@ public class Quatro extends Agent{
             System.out.println("Timeout agotado: perdidos " + (respuestas.size()) + " participantes");
             ACLMessage ficha = null, movimiento = null;
             try {
-                Thread.sleep(1000);
+                Thread.sleep(400);
             } catch (InterruptedException ex) {
-                Logger.getLogger(Quatro.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(Tablero.class.getName()).log(Level.SEVERE, null, ex);
             }
             for (Object resp : respuestas) {
                 ACLMessage mensaje = (ACLMessage) resp;
@@ -195,29 +193,27 @@ public class Quatro extends Agent{
                 if (mensaje.getPerformative() == ACLMessage.PROPOSE) {
                     try {
                         System.out.print("Handle all responsees PROPOSE \n");
-                        FichaEntregada fe = (FichaEntregada) manager.extractContent(mensaje);
-                        if ((fe.getFicha().getColor() != 0) && (fe.getFicha().getForma() != 0) && (fe.getFicha().getAltura() != 0) && (fe.getFicha().getEstado() != 0)) {
-                            System.out.print("Guardando ficha\n");
-                            //saveFicha = new quatro.elementos.Ficha(fe.getFicha().getColor(), fe.getFicha().getForma(), fe.getFicha().getAltura(), fe.getFicha().getEstado());
+                        FichaEntregada fe = (FichaEntregada)manager.extractContent(mensaje);
+                        if ((fe.getFicha().getColor() != 0) && (fe.getFicha().getForma() != 0) && (fe.getFicha().getAltura() != 0) && (fe.getFicha().getEstado() != 0)) { 
+                            System.out.print("Guardando ficha\n");                  
                             saveFicha = fe.getFicha();
                             quatro.Ficha f = new quatro.Ficha(fe.getFicha().getColor(), fe.getFicha().getForma(), fe.getFicha().getAltura(), fe.getFicha().getEstado());
                             gui.log.setText(gui.jE  + " ha enviado la pieza "+ f.toACL() +"\n" + gui.log.getText());
                             System.out.print("Ficha: " + fe.getFicha().getColor());
                             ficha = mensaje.createReply();
                             System.out.print(mensaje.getContent() + "\n");
-//                            PedirMovimiento pm = new PedirMovimiento(participantes[turno], partida, saveFicha);
-//                            Action a = new Action();
-//                            a.setAction(pm);
-//                            a.setActor(pm.getJugador().getJugador());
-//                            manager.fillContent(ficha, a);
                             ficha.setPerformative(ACLMessage.REJECT_PROPOSAL); /*Aqui enviar peticion de movimiento*/
                             aceptados.add(ficha);
                         } else {
                             movimiento = mensaje.createReply(); 
+                            if(fe.getVictoria().isVictoria()){
+                                gui.log.setText(gui.jT+ " ha pedido comprobación de victoria." + gui.log.getText());
+                                gui.compruebaGanador();
+                            }
                         }
 
                     } catch (Codec.CodecException | OntologyException ex) {
-                        Logger.getLogger(Quatro.class.getName()).log(Level.SEVERE, null, ex);
+                        Logger.getLogger(Tablero.class.getName()).log(Level.SEVERE, null, ex);
                     }
 
                 }
@@ -236,7 +232,7 @@ public class Quatro extends Agent{
                     movimiento.setPerformative(ACLMessage.ACCEPT_PROPOSAL);
                     aceptados.add(movimiento);
                 } catch (Codec.CodecException | OntologyException ex) {
-                    Logger.getLogger(Quatro.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(Tablero.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
 
@@ -257,29 +253,27 @@ public class Quatro extends Agent{
         @Override
         protected void handleInform(ACLMessage inform) {
             gui.estado = 1;
-            System.out.print("HOLAAA \n");
             try {
-                Thread.sleep(1000);
+                Thread.sleep(400);
             } catch (InterruptedException ex) {
-                Logger.getLogger(Quatro.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(Tablero.class.getName()).log(Level.SEVERE, null, ex);
             }
-            /*if(cadenas[4].equals("1")){
-                gui.log.setText(cadenas[0] + " ha pedido la comprobación de victoria! \n" + gui.log.getText() );
-                win = true;
-            }*/
             MovimientoRealizado fe = null;
             AbsPredicate cs = null;
             try {
                 cs = (AbsPredicate)myAgent.getContentManager().extractAbsContent(inform);
             } catch (Codec.CodecException | OntologyException ex) {
-                Logger.getLogger(Quatro.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(Tablero.class.getName()).log(Level.SEVERE, null, ex);
             }
             Ontology o = myAgent.getContentManager().lookupOntology(OntologiaQuatro.ONTOLOGY_NAME);
             try {
                 fe = (MovimientoRealizado)o.toObject((AbsObject)cs);
-                System.out.println(fe.getMovimiento() + "\n");
+                if(fe.getVictoria().isVictoria()){
+                    gui.log.setText(gui.jT+ " ha pedido comprobación de victoria." + gui.log.getText());
+                    gui.compruebaGanador();
+                }
             } catch (OntologyException ex) {
-                Logger.getLogger(Quatro.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(Tablero.class.getName()).log(Level.SEVERE, null, ex);
             }
             if(fe.getMovimiento() != null){
                 quatro.elementos.Ficha fi = fe.getMovimiento().getFicha();
@@ -289,12 +283,11 @@ public class Quatro extends Agent{
                 
             }
             
-            //saveX = Integer.parseInt(cadenas[1]); saveY = Integer.parseInt(cadenas[2]);
            
             try {
                 Thread.sleep(300);
             } catch (InterruptedException ex) {
-                Logger.getLogger(Quatro.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(Tablero.class.getName()).log(Level.SEVERE, null, ex);
             }
             if(gui.estado != 2) comenzarTurno();          
         }
@@ -364,12 +357,12 @@ public class Quatro extends Agent{
                     if (jugadores.length == 0)  System.out.println("No se ha encontrado ningún jugador! \n");
                     else gui.log.setText("Se ha encontrado " + jugadores.length + " jugador/es.\n" + gui.log.getText());          
                 } catch (FIPAException ex) {
-                    Logger.getLogger(Quatro.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(Tablero.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 
                 
             } catch (InterruptedException ex) {
-                Logger.getLogger(Quatro.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(Tablero.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
         
@@ -401,7 +394,7 @@ public class Quatro extends Agent{
                 try {
                     manager.fillContent(mensaje, a);
                 } catch (Codec.CodecException | OntologyException ex) {
-                    Logger.getLogger(Quatro.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(Tablero.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 //Se añade el destinatario.
                 participantes[0] = new Jugador(jugadores[0].getName());
@@ -413,7 +406,7 @@ public class Quatro extends Agent{
                     Thread.sleep(1200);
                     if(jugadores.length < 2) reset();
                 } catch (InterruptedException ex) {
-                    Logger.getLogger(Quatro.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(Tablero.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 
                 //Añadir el comportamiento
