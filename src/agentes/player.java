@@ -10,8 +10,6 @@
 package agentes;
 
 import jade.content.ContentManager;
-import jade.content.abs.AbsObject;
-import jade.content.abs.AbsPredicate;
 import jade.content.lang.Codec;
 import jade.content.lang.sl.SLCodec;
 import jade.content.onto.BeanOntologyException;
@@ -55,7 +53,6 @@ public class player extends Agent  {
     Boolean[][] tablero = new Boolean[4][4];
     private Ontology ontologia;
     private Codec codec;
-    private Movimiento lastMov;
     
     protected void inicializar(){
         fichas[0][0] = "CAHB";

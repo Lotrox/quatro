@@ -27,12 +27,15 @@ import jade.domain.FIPANames;
 import jade.lang.acl.ACLMessage;
 import jade.proto.ContractNetInitiator;
 import jade.proto.ProposeInitiator;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.util.Date;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import quatro.elementos.FichaEntregada;
+import quatro.elementos.Ganador;
 import quatro.elementos.IniciarPartida;
 import quatro.elementos.Juego;
 import quatro.elementos.Jugador;
@@ -61,6 +64,7 @@ public class Tablero extends Agent{
     private Movimiento movAnterior = null;
     private final ContentManager manager = (ContentManager) getContentManager();
     int turno;
+    private Jugador ganador;
 
 
     
@@ -68,6 +72,13 @@ public class Tablero extends Agent{
     protected void setup(){
         // Registra el lenguaje de contenido y la ontologia utilizada
         gui.setVisible(true);
+        ganador = null;
+        gui.addWindowListener(new WindowAdapter(){
+            public void windowClosin(WindowEvent e){
+                doDelete();
+            }
+        });
+        
         try {
             OntologiaQuatro.getInstance();
         } catch (BeanOntologyException ex) {
@@ -92,7 +103,7 @@ public class Tablero extends Agent{
         ServiceDescription servicio = new ServiceDescription(); 
         servicio.setType(OntologiaQuatro.REGISTRO_TABLERO); //Establecemos nombre al tipo de servicio.
         servicio.setName(getLocalName()); //Establecemos nombre del servicio.
-        servicio.addOntologies(OntologiaQuatro.ONTOLOGY_NAME);
+        //servicio.addOntologies(OntologiaQuatro.ONTOLOGY_NAME); //No se entiende con el resto del mundo.
         servicio.addLanguages(FIPANames.ContentLanguage.FIPA_SL);
         
         descripcion.addServices(servicio); //Añade el servicio a la descripción. 
@@ -137,6 +148,10 @@ public class Tablero extends Agent{
                         Logger.getLogger(Tablero.class.getName()).log(Level.SEVERE, null, ex);
                     }
                     gui.reset();
+                    ganador = null;
+                    saveFicha = null;
+                    j1 = false;
+                    j2 = false;
                     this.addBehaviour(new BuscarJugadores());      
                     }
             }
@@ -199,7 +214,7 @@ public class Tablero extends Agent{
                             System.out.print("Guardando ficha\n");                  
                             saveFicha = fe.getFicha();
                             quatro.Ficha f = new quatro.Ficha(fe.getFicha().getColor(), fe.getFicha().getForma(), fe.getFicha().getAltura(), fe.getFicha().getEstado());
-                            gui.log.setText(gui.jE  + " ha enviado la pieza "+ f.toACL() +"\n " + gui.log.getText());
+                            gui.log.setText(gui.jT  + " ha enviado la pieza "+ f.toACL() +"\n " + gui.log.getText());
                             try {
                                 gui.fichaSave.setIcon(f.pintar());
                             } catch (IOException ex) {
@@ -213,9 +228,9 @@ public class Tablero extends Agent{
                         } else {
                             movimiento = mensaje.createReply(); 
                             if(fe.getVictoria().isVictoria()){
-                                gui.log.setText(gui.jT+ " ha pedido comprobación de victoria.\n " + gui.log.getText());
+                                gui.log.setText(gui.jE+ " ha pedido comprobación de victoria.\n " + gui.log.getText());
                                 gui.compruebaGanador();
-                                gui.reset();
+                                ganador = participantes[turno];
                             }
                         }
 
@@ -246,6 +261,7 @@ public class Tablero extends Agent{
 
         @Override
         protected void handleInform(ACLMessage inform) {
+            
             gui.estado = 1;
             try {
                 Thread.sleep(800);
@@ -263,13 +279,14 @@ public class Tablero extends Agent{
             try {
                 fe = (MovimientoRealizado)o.toObject((AbsObject)cs);
                 if(fe.getVictoria().isVictoria()){
-                    gui.log.setText(gui.jT+ " ha pedido comprobación de victoria. " + gui.log.getText());
+                    gui.log.setText(gui.jE+ " ha pedido comprobación de victoria. " + gui.log.getText());
                     gui.compruebaGanador();
-                    gui.reset();
+                    ganador = fe.getJugador();
                 }
             } catch (OntologyException ex) {
                 Logger.getLogger(Tablero.class.getName()).log(Level.SEVERE, null, ex);
             }
+            
             if(fe.getMovimiento() != null){
                 quatro.elementos.Ficha fi = fe.getMovimiento().getFicha();
                 quatro.Ficha f = new quatro.Ficha(fi.getColor(), fi.getForma(), fi.getAltura(), fi.getEstado());
@@ -284,7 +301,26 @@ public class Tablero extends Agent{
             } catch (InterruptedException ex) {
                 Logger.getLogger(Tablero.class.getName()).log(Level.SEVERE, null, ex);
             }
-            if(gui.estado != 2) comenzarTurno();          
+            if(gui.estado != 2) comenzarTurno();  
+            
+            if(ganador != null){
+                ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+                msg.setOntology(ontologia.getName());
+                msg.setLanguage(codec.getName());
+                msg.addReceiver(participantes[0].getJugador());
+                msg.addReceiver(participantes[1].getJugador());
+                try {
+                    manager.fillContent(msg, new Ganador(partida, ganador));
+                } catch (Codec.CodecException | OntologyException ex) {
+                    Logger.getLogger(Tablero.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                send(msg);
+                ganador = null;
+                saveFicha = null;
+                j1 = false;
+                j2 = false;
+                gui.reset();
+            }
         }
         
         
@@ -377,7 +413,7 @@ public class Tablero extends Agent{
             }else{
                 System.out.print("FIN busqueda jugadores \n ");
                 ACLMessage mensaje = new ACLMessage(ACLMessage.PROPOSE);
-                mensaje.setProtocol(FIPANames.InteractionProtocol.FIPA_PROPOSE);
+                //mensaje.setProtocol(FIPANames.InteractionProtocol.FIPA_PROPOSE);
                 mensaje.setReplyByDate(new Date(System.currentTimeMillis() + 10000));
                 mensaje.setOntology(ontologia.getName());
                 mensaje.setLanguage(codec.getName());

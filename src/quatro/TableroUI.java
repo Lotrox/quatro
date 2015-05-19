@@ -99,7 +99,7 @@ public class TableroUI extends javax.swing.JFrame {
     public void movimiento(int x, int y, Ficha f, Boolean Quatro) {
         if(estado==1){
             jLabel1.setText("Jugando");  
-            log.setText(jT+ " ha posicionado la pieza: " +f.toACL() + " en la posición (" + x + ", " + y + ") \n " + log.getText());
+            log.setText(jE+ " ha posicionado la pieza: " +f.toACL() + " en la posición (" + x + ", " + y + ") \n " + log.getText());
             
             if ((x < 0 || x > 3) || (y < 0 || y > 3)) { //Posición fuera del tablero.
                 try {
