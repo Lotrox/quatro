@@ -1,11 +1,11 @@
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
- * and open the template in the editor.
  */
 
 /*-gui Tablero:quatro.Tablero;Jugador1:agentes.player;Jugador2:agentes.player*/
 /*java -cp "Desktop\Quatro 30-4\lib\jade.jar" -jar "Desktop\Quatro 30-4\MULTIAGENTE_QUATRO.jar" -gui*/
+/*Esto es una prueba*/
 
 package agentes;
 
