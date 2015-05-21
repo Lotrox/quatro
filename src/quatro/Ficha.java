@@ -19,7 +19,7 @@ import javax.swing.ImageIcon;
 
 public class Ficha {
     
-    char[] carac = new char[4];
+    public char[] carac = new char[4];
     
     /**
      * @brief Constructor principal de la clase Ficha.

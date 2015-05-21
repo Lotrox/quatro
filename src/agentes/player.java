@@ -50,7 +50,8 @@ public class player extends Agent  {
     private ContentManager manager = (ContentManager) getContentManager();
     boolean jugando;
     String[][] fichas = new String[16][2];
-    Boolean[][] tablero = new Boolean[4][4];
+//  Boolean[][] tablero = new Boolean[4][4];
+    Ficha[][] tablero = new Ficha[5][5];
     private Ontology ontologia;
     private Codec codec;
     
@@ -76,7 +77,7 @@ public class player extends Agent  {
         }  
         for(int i=0;i<4;i++){
             for(int j=0;j<4;j++){
-                tablero[i][j] = false;
+                tablero[i][j] = null;
             }
         }
     }
@@ -181,6 +182,7 @@ public class player extends Agent  {
             }
         }
     }
+
     
     private class ContractNet extends ContractNetResponder {
         public ContractNet(Agent agente, MessageTemplate plantilla) {
@@ -197,10 +199,12 @@ public class player extends Agent  {
                 PedirFicha pedir = (PedirFicha)a.getAction();
                 
                 if(pedir.getAnterior() != null){
-                    tablero[pedir.getAnterior().getPosicion().getFila()][pedir.getAnterior().getPosicion().getColumna()] = true;
+                    
                     quatro.elementos.Ficha f = pedir.getAnterior().getFicha();
+
                     Ficha fich = new Ficha(f.getColor(),f.getForma(),f.getAltura(),f.getEstado());
                     System.out.print("Registrando ficha del movimiento anterior: " + fich.toACL() + "\n");
+                    tablero[pedir.getAnterior().getPosicion().getFila()][pedir.getAnterior().getPosicion().getColumna()] = fich;
                     registrarFicha(fich.toACL());
                 }
                     
@@ -220,18 +224,97 @@ public class player extends Agent  {
             }
             return resp;
        }
+        
+        protected Boolean hayVictoria() {
+            int blancoF, blancoC, negroF, negroC;
+            int altaF, altaC, bajaF , bajaC;
+            int redondaF, redondaC, cuadradaF, cuadradaC;
+            int huecaF, huecaC, rellenaF, rellenaC;
+            int alB, alN, alA, alBa, alR, alC, alH, alRe;
+
+
+            for(int j=0;j<4;j++){
+
+                blancoF = 0; blancoC = 0; negroF = 0; negroC = 0;
+                altaF = 0; altaC=0; bajaF = 0; bajaC = 0;
+                redondaF = 0; redondaC=0; cuadradaF = 0; cuadradaC = 0;
+                huecaF = 0; huecaC = 0; rellenaF = 0; rellenaC = 0;
+
+                for (int i = 0; i < 4; i++) { //Comprobación de líneas.
+
+                    alB = 0; alN =0; alA = 0; alBa = 0; alR = 0; alC = 0; alH = 0; alRe = 0;
+                    
+                    if (tablero[j][i] != null) { //Filas
+                        if (tablero[j][i].carac[3] == 'B') blancoF++; 
+                        if (tablero[j][i].carac[3] == 'N') negroF++;
+                        if (tablero[j][i].carac[1] == 'A') altaF++; 
+                        if (tablero[j][i].carac[1] == 'B') bajaF++; 
+                        if (tablero[j][i].carac[0] == 'R') redondaF++; 
+                        if (tablero[j][i].carac[0] == 'C') cuadradaF++; 
+                        if (tablero[j][i].carac[2] == 'H') huecaF++; 
+                        if (tablero[j][i].carac[2] == 'R') rellenaF++; 
+                    }
+                    if (tablero[i][j] != null) { //Columnas
+                        if (tablero[i][j].carac[3] == 'B') blancoC++;
+                        if (tablero[i][j].carac[3] == 'N') negroC++;
+                        if (tablero[i][j].carac[1] == 'A') altaC++;
+                        if (tablero[i][j].carac[1] == 'B') bajaC++;
+                        if (tablero[i][j].carac[0] == 'R') redondaC++;
+                        if (tablero[i][j].carac[0] == 'C') cuadradaC++;
+                        if (tablero[i][j].carac[2] == 'H') huecaC++;
+                        if (tablero[i][j].carac[2] == 'R') rellenaC++;
+                    }
+                    //Comprobación de victoria Filas
+                    if ((((blancoF == 4) || (negroF == 4)) || ((altaF == 4) || (bajaF == 4))) ||
+                    (((redondaF == 4) || (cuadradaF == 4)) || ((huecaF == 4) || (rellenaF == 4)))){
+                        System.out.print("QUATRO! JUGADOR");
+                        return true;
+                    } 
+                    //Comprobación de victoria Columnas
+                    if ((((blancoC == 4) || (negroC == 4)) || ((altaC == 4) || (bajaC == 4))) ||
+                    (((redondaC == 4) || (cuadradaC == 4)) || ((huecaC == 4) || (rellenaC == 4)))){
+                        System.out.print("QUATRO! JUGADOR");
+                        return true;
+                    }
+
+                }
+            }
+
+                for(int i=0;i<4;i++){ //Comprobación de diagonal.
+                    if((tablero[1][1] != null) && (tablero[2][2] != null) && (tablero[3][3] != null) && (tablero[0][0] != null)){
+
+                        if  ((tablero[1][1].carac[i] == tablero[2][2].carac[i]) && (tablero[3][3].carac[i] == tablero[0][0].carac[i])){
+                            return true; 
+                        }       
+                    }
+                    if((tablero[3][0] != null) && (tablero[2][1] != null) && (tablero[1][2] != null) && (tablero[0][4] != null)){
+                        if(((tablero[3][0].carac[i] == tablero[2][1].carac[i]) && (tablero[1][2].carac[i] == tablero[0][3].carac[i]))){
+                           return true; 
+                        }
+                    }
+                }
+
+                return false;
+        }
     
        
-       protected String colocarFicha(){
+       protected String colocarFicha(Ficha f){
            for(int i=0;i<4;i++){
                for(int j=0;j<4;j++){
-                if(!tablero[i][j]){
-                    tablero[i][j] = true;
-                    return String.valueOf(i)+";"+String.valueOf(j);
+                if(tablero[i][j] == null){
+                    tablero[i][j] = f;
+                    if(hayVictoria()){
+                        return String.valueOf(i)+";"+String.valueOf(j)+";WIN";
+                    }else tablero[i][j] = null;
                 }
                }
            }
-           return ";";
+           int i = 0, j = 0;
+           while(tablero[i][j] != null){
+               i = 0 + (int)(Math.random()*4);
+               j = 0 + (int)(Math.random()*4);
+           }
+           return String.valueOf(i)+";"+String.valueOf(j)+"; ";
        }
         
         @Override
@@ -253,11 +336,15 @@ public class player extends Agent  {
            
             if(fe != null){
                 System.out.println("JUGADOR " + myAgent.getLocalName() + fe.getFicha().getAltura() + "\n");
-                String[] posxy = colocarFicha().split(";");
+                Ficha fich = new Ficha(fe.getFicha().getColor(),fe.getFicha().getForma(),fe.getFicha().getAltura(),fe.getFicha().getEstado());
+                String[] posxy = colocarFicha(fich).split(";");
+                Boolean marcaVictoria = false;
+                if(posxy[2].equals("WIN")) marcaVictoria = true;
                 Jugador j = fe.getJugador();
                 Posicion p = new Posicion(Integer.parseInt(posxy[0]),Integer.parseInt(posxy[1]));
                 Movimiento m = new Movimiento(fe.getFicha(), p);
-                Victoria v = new Victoria(false);
+                registrarFicha(fich.toACL());
+                Victoria v = new Victoria(marcaVictoria);
                 MovimientoRealizado mr = new MovimientoRealizado(j, m);
                 mr.setVictoria(v);
                 try {

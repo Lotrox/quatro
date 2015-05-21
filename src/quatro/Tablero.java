@@ -228,9 +228,7 @@ public class Tablero extends Agent{
                         } else {
                             movimiento = mensaje.createReply(); 
                             if(fe.getVictoria().isVictoria()){
-                                gui.log.setText(gui.jE+ " ha pedido comprobación de victoria.\n " + gui.log.getText());
-                                gui.compruebaGanador();
-                                ganador = participantes[turno];
+                                gui.log.setText(gui.jE+ " ha pedido comprobación de victoria.\n " + gui.log.getText());  
                             }
                         }
 
@@ -280,8 +278,6 @@ public class Tablero extends Agent{
                 fe = (MovimientoRealizado)o.toObject((AbsObject)cs);
                 if(fe.getVictoria().isVictoria()){
                     gui.log.setText(gui.jE+ " ha pedido comprobación de victoria. " + gui.log.getText());
-                    gui.compruebaGanador();
-                    ganador = fe.getJugador();
                 }
             } catch (OntologyException ex) {
                 Logger.getLogger(Tablero.class.getName()).log(Level.SEVERE, null, ex);
@@ -292,6 +288,12 @@ public class Tablero extends Agent{
                 quatro.Ficha f = new quatro.Ficha(fi.getColor(), fi.getForma(), fi.getAltura(), fi.getEstado());
                 gui.movimiento(fe.getMovimiento().getPosicion().getFila(), fe.getMovimiento().getPosicion().getColumna(), f, false);
                 movAnterior = fe.getMovimiento();
+                if(fe.getVictoria().isVictoria()){
+                    gui.compruebaGanador();
+                    if(turno == 0) turno = 1;
+                    else turno = 0;
+                    ganador = participantes[turno];
+                }
                 
             }
             
