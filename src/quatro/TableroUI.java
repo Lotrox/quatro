@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JButton;
-import javax.swing.JOptionPane;
 
 /**
  *
@@ -61,6 +60,9 @@ public class TableroUI extends javax.swing.JFrame {
     }
     
        public void reset() {
+        
+        fichaSave.setIcon(null);
+        log.setText(" ");
         for(int i=0;i<5;i++){
             for(int j=0;j<5;j++){
                 fichas[i][j] = null;
@@ -70,24 +72,6 @@ public class TableroUI extends javax.swing.JFrame {
                 }
             }
         }
-        fichaSave.setIcon(null);
-        log.setText(" ");
-        pos[0][0] = pos13;
-        pos[0][1] = pos14;
-        pos[0][2] = pos15;
-        pos[0][3] = pos16;
-        pos[1][0] = pos9;
-        pos[1][1] = pos10;
-        pos[1][2] = pos11;
-        pos[1][3] = pos12;
-        pos[2][0] = pos5;
-        pos[2][1] = pos6;
-        pos[2][2] = pos7;
-        pos[2][3] = pos8;
-        pos[3][0] = pos1;
-        pos[3][1] = pos2;
-        pos[3][2] = pos3;
-        pos[3][3] = pos4;
         estado = 0;
         jLabel1.setText("Buscando jugadores...");  
     }
@@ -271,7 +255,7 @@ public class TableroUI extends javax.swing.JFrame {
                 if((fichas[1][1] != null) && (fichas[2][2] != null) && (fichas[3][3] != null) && (fichas[0][0] != null)){
                     
                     
-                    if  ((fichas[1][1].carac[i] == fichas[2][2].carac[i]) && (fichas[3][3].carac[i] == fichas[0][0].carac[i])){
+                     if  ((fichas[1][1].carac[i] == fichas[2][2].carac[i]) && (fichas[3][3].carac[i] == fichas[0][0].carac[i]) && (fichas[1][1].carac[i] == fichas[3][3].carac[i])){
                         pos[1][1].setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 255, 0), 4, true));
                         pos[2][2].setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 255, 0), 4, true));
                         pos[3][3].setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 255, 0), 4, true));
@@ -285,7 +269,7 @@ public class TableroUI extends javax.swing.JFrame {
                     }       
                 }
                 if((fichas[3][0] != null) && (fichas[2][1] != null) && (fichas[1][2] != null) && (fichas[0][4] != null)){
-                    if(((fichas[3][0].carac[i] == fichas[2][1].carac[i]) && (fichas[1][2].carac[i] == fichas[0][3].carac[i]))){
+                    if  ((fichas[3][0].carac[i] == fichas[2][1].carac[i]) && (fichas[1][2].carac[i] == fichas[0][3].carac[i]) && (fichas[3][0].carac[i] == fichas[1][2].carac[i])){
                         pos[3][0].setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 255, 0), 4, true));
                         pos[2][1].setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 255, 0), 4, true));
                         pos[1][2].setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 255, 0), 4, true));

@@ -204,7 +204,7 @@ public class player extends Agent  {
                     quatro.elementos.Ficha f = pedir.getAnterior().getFicha();
 
                     Ficha fich = new Ficha(f.getColor(),f.getForma(),f.getAltura(),f.getEstado());
-                    System.out.print("Registrando ficha del movimiento anterior: " + fich.toACL() + "\n");
+                   // System.out.print("Registrando ficha del movimiento anterior: " + fich.toACL() + "\n");
                     tablero[pedir.getAnterior().getPosicion().getFila()][pedir.getAnterior().getPosicion().getColumna()] = fich;
                     registrarFicha(fich.toACL());
                 }
@@ -212,7 +212,7 @@ public class player extends Agent  {
                 if(!(pedir.getJugadorActivo().getJugador().equals(myAgent.getAID()))){
                      Ficha fich = new Ficha(selectFicha());
                      quatro.elementos.Ficha f = new quatro.elementos.Ficha(fich.getColor(),fich.getForma(),fich.getAltura(),fich.getEstado());
-                     System.out.print(myAgent.getAID() + "[Pasivo] Enviando ficha: " + fich.toACL() + "\n");
+                     //System.out.print(myAgent.getAID() + "[Pasivo] Enviando ficha: " + fich.toACL() + "\n");
                      Victoria v = new Victoria(false);
                      fe = new FichaEntregada(f, null);
                 }else{
@@ -321,8 +321,8 @@ public class player extends Agent  {
         @Override
        protected ACLMessage prepareResultNotification(ACLMessage cfp, ACLMessage propose, ACLMessage accept) throws FailureException {
            /*Aquí ponemos el Movimiento realizado y eso*/     
-           System.out.print("PLAYER PREPARE  RESULT NOTIF \n");
-           System.out.println("JUGADOR " + myAgent.getLocalName() + "\n");
+          // System.out.print("PLAYER PREPARE  RESULT NOTIF \n");
+           //System.out.println("JUGADOR " + myAgent.getLocalName() + "\n");
             ACLMessage inform = accept.createReply();
             inform.setPerformative(ACLMessage.INFORM);
             PedirMovimiento fe = null;
@@ -336,7 +336,7 @@ public class player extends Agent  {
             Ontology o = myAgent.getContentManager().lookupOntology(OntologiaQuatro.ONTOLOGY_NAME);
            
             if(fe != null){
-                System.out.println("JUGADOR " + myAgent.getLocalName() + fe.getFicha().getAltura() + "\n");
+                //System.out.println("JUGADOR " + myAgent.getLocalName() + fe.getFicha().getAltura() + "\n");
                 Ficha fich = new Ficha(fe.getFicha().getColor(),fe.getFicha().getForma(),fe.getFicha().getAltura(),fe.getFicha().getEstado());
                 String[] posxy = colocarFicha(fich).split(";");
                 Boolean marcaVictoria = false;
@@ -354,7 +354,7 @@ public class player extends Agent  {
                     Logger.getLogger(player.class.getName()).log(Level.SEVERE, null, ex);
                 }     
             }
-            System.out.print("INFORM: " + inform.getContent() + "\n");
+            //System.out.print("INFORM: " + inform.getContent() + "\n");
             return inform;
         }
     }
