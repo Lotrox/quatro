@@ -4,7 +4,7 @@
  */
 
 /*-gui Tablero:quatro.Tablero;Jugador1:agentes.player;Jugador2:agentes.player*/
-/*java -cp "Desktop\Quatro 30-4\lib\jade.jar" -jar "Desktop\Quatro 30-4\MULTIAGENTE_QUATRO.jar" -gui*/
+/*java -cp "Desktop\lib\jade.jar" -jar "Desktop\MULTIAGENTE_QUATRO.jar" -gui*/
 /*Esto es una prueba*/
 
 package agentes;
@@ -29,6 +29,8 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.proto.ContractNetResponder;
 import jade.proto.ProposeResponder;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import quatro.Ficha;
@@ -50,7 +52,6 @@ public class player extends Agent  {
     private ContentManager manager = (ContentManager) getContentManager();
     boolean jugando;
     String[][] fichas = new String[16][2];
-//  Boolean[][] tablero = new Boolean[4][4];
     Ficha[][] tablero = new Ficha[5][5];
     private Ontology ontologia;
     private Codec codec;
@@ -143,7 +144,8 @@ public class player extends Agent  {
         @Override
         protected ACLMessage prepareResponse(ACLMessage propuesta)
                 throws NotUnderstoodException {
-
+            jugando = false;
+            inicializar();
             //Comprueba los datos de la propuesta
                 //Aceptación de la propuesta.
                 //Se crea la respuesta al mensaje con la performativa ACCEPT_PROPOSAL, pues se acepta.
@@ -155,7 +157,6 @@ public class player extends Agent  {
             }else{
                 //Rechazo de la propuesta.
                 //Se crea la respuesta al mensaje con la performativa REJECT_PROPOSAL, pues se rechaza.
-                jugando = true;
                 reset();
                 ACLMessage refuse = propuesta.createReply();
                 refuse.setPerformative(ACLMessage.REJECT_PROPOSAL);
@@ -283,12 +284,12 @@ public class player extends Agent  {
                 for(int i=0;i<4;i++){ //Comprobación de diagonal.
                     if((tablero[1][1] != null) && (tablero[2][2] != null) && (tablero[3][3] != null) && (tablero[0][0] != null)){
 
-                        if  ((tablero[1][1].carac[i] == tablero[2][2].carac[i]) && (tablero[3][3].carac[i] == tablero[0][0].carac[i])){
+                        if  ((tablero[1][1].carac[i] == tablero[2][2].carac[i]) && (tablero[3][3].carac[i] == tablero[0][0].carac[i]) && (tablero[1][1].carac[i] == tablero[3][3].carac[i])){
                             return true; 
                         }       
                     }
                     if((tablero[3][0] != null) && (tablero[2][1] != null) && (tablero[1][2] != null) && (tablero[0][4] != null)){
-                        if(((tablero[3][0].carac[i] == tablero[2][1].carac[i]) && (tablero[1][2].carac[i] == tablero[0][3].carac[i]))){
+                        if  ((tablero[3][0].carac[i] == tablero[2][1].carac[i]) && (tablero[1][2].carac[i] == tablero[0][3].carac[i]) && (tablero[3][0].carac[i] == tablero[1][2].carac[i])){
                            return true; 
                         }
                     }

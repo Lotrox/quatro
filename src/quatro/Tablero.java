@@ -34,6 +34,7 @@ import java.util.Date;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 import quatro.elementos.FichaEntregada;
 import quatro.elementos.Ganador;
 import quatro.elementos.IniciarPartida;
@@ -74,7 +75,7 @@ public class Tablero extends Agent{
         gui.setVisible(true);
         ganador = null;
         gui.addWindowListener(new WindowAdapter(){
-            public void windowClosin(WindowEvent e){
+            public void windowClosing(WindowEvent e){
                 doDelete();
             }
         });
@@ -147,6 +148,7 @@ public class Tablero extends Agent{
                     } catch (InterruptedException ex) {
                         Logger.getLogger(Tablero.class.getName()).log(Level.SEVERE, null, ex);
                     }
+                    JOptionPane.showMessageDialog(null,"EMPATE EN LA PARTIDA!");
                     gui.reset();
                     ganador = null;
                     saveFicha = null;
@@ -228,7 +230,8 @@ public class Tablero extends Agent{
                         } else {
                             movimiento = mensaje.createReply(); 
                             if(fe.getVictoria().isVictoria()){
-                                gui.log.setText(gui.jE+ " ha pedido comprobación de victoria.\n " + gui.log.getText());  
+                                gui.log.setText(gui.jE+ " ha pedido comprobación de victoria.\n " + gui.log.getText()); 
+                                ganador = participantes[turno];
                             }
                         }
 
@@ -277,7 +280,7 @@ public class Tablero extends Agent{
             try {
                 fe = (MovimientoRealizado)o.toObject((AbsObject)cs);
                 if(fe.getVictoria().isVictoria()){
-                    gui.log.setText(gui.jE+ " ha pedido comprobación de victoria. " + gui.log.getText());
+                    gui.log.setText(gui.jE+ " ha pedido comprobación de victoria.\n " + gui.log.getText());
                 }
             } catch (OntologyException ex) {
                 Logger.getLogger(Tablero.class.getName()).log(Level.SEVERE, null, ex);
@@ -288,10 +291,7 @@ public class Tablero extends Agent{
                 quatro.Ficha f = new quatro.Ficha(fi.getColor(), fi.getForma(), fi.getAltura(), fi.getEstado());
                 gui.movimiento(fe.getMovimiento().getPosicion().getFila(), fe.getMovimiento().getPosicion().getColumna(), f, false);
                 movAnterior = fe.getMovimiento();
-                if(fe.getVictoria().isVictoria()){
-                    gui.compruebaGanador();
-                    if(turno == 0) turno = 1;
-                    else turno = 0;
+                if(fe.getVictoria().isVictoria()){ 
                     ganador = participantes[turno];
                 }
                 
@@ -303,9 +303,12 @@ public class Tablero extends Agent{
             } catch (InterruptedException ex) {
                 Logger.getLogger(Tablero.class.getName()).log(Level.SEVERE, null, ex);
             }
-            if(gui.estado != 2) comenzarTurno();  
-            
             if(ganador != null){
+                if(!gui.compruebaGanador()){ 
+                    if(turno == 0) turno = 1;
+                    else turno = 0;
+                    ganador = participantes[turno];
+                }
                 ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
                 msg.setOntology(ontologia.getName());
                 msg.setLanguage(codec.getName());
@@ -317,12 +320,14 @@ public class Tablero extends Agent{
                     Logger.getLogger(Tablero.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 send(msg);
+                JOptionPane.showMessageDialog(null,ganador.getJugador().getLocalName() + " HA GANADO!");
                 ganador = null;
                 saveFicha = null;
                 j1 = false;
                 j2 = false;
                 gui.reset();
             }
+            if(gui.estado != 2) comenzarTurno();    
         }
         
         
@@ -410,6 +415,7 @@ public class Tablero extends Agent{
             
             // Hace que el comportamiento se reinicie al finalizar.
             if(jugadores.length < 2){
+                JOptionPane.showMessageDialog(null,ganador.getJugador().getLocalName() + " HA GANADO!");
                 reset();
                 myAgent.addBehaviour(this);
             }else{

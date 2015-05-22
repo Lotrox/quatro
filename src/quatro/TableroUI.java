@@ -31,11 +31,7 @@ public class TableroUI extends javax.swing.JFrame {
     int estado; // 0: Buscando jugadores, 1: jugando, 2: finalizado
     
     public TableroUI() {
-        for(int i=0;i<5;i++){
-            for(int j=0;j<5;j++){
-                fichas[i][j] = null;
-            }
-        }
+        
         initComponents();
         pos[0][0] = pos13;
         pos[0][1] = pos14;
@@ -53,16 +49,25 @@ public class TableroUI extends javax.swing.JFrame {
         pos[3][1] = pos2;
         pos[3][2] = pos3;
         pos[3][3] = pos4;
-        estado = 0;
-        jLabel1.setText("Buscando jugadores...");  
-    }
-    
-       public void reset() {
-        JOptionPane.showMessageDialog(null,"FIN DE LA PARTIDA");
+        
         for(int i=0;i<5;i++){
             for(int j=0;j<5;j++){
                 fichas[i][j] = null;
-                if(i<4 && j<4) pos[i][j].setIcon(null);
+                if(i<4 && j<4) pos[i][j].setBorder(javax.swing.BorderFactory.createMatteBorder(3, 3, 3, 3, new java.awt.Color(153, 153, 0)));
+            }
+        }
+        estado = 0;
+        jLabel1.setText("Buscando...");  
+    }
+    
+       public void reset() {
+        for(int i=0;i<5;i++){
+            for(int j=0;j<5;j++){
+                fichas[i][j] = null;
+                if(i<4 && j<4){
+                    pos[i][j].setIcon(null);
+                    pos[i][j].setBorder(new javax.swing.border.LineBorder(new java.awt.Color(153, 153, 0), 4, true));
+                }
             }
         }
         fichaSave.setIcon(null);
@@ -236,7 +241,7 @@ public class TableroUI extends javax.swing.JFrame {
                 if ((((blancoF == 4) || (negroF == 4)) || ((altaF == 4) || (bajaF == 4))) ||
                 (((redondaF == 4) || (cuadradaF == 4)) || ((huecaF == 4) || (rellenaF == 4)))){
                     for(int ii=0;ii<4;ii++){
-                         pos[j][ii].setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 255, 0), 4, true));
+                         pos[j][ii].setBorder(javax.swing.BorderFactory.createMatteBorder(3, 3, 3, 3, new java.awt.Color(0, 255, 0)));
                     }
                     System.out.print("QUATRO!");
                     jLabel1.setText("QUATRO!");
@@ -248,11 +253,11 @@ public class TableroUI extends javax.swing.JFrame {
                 //Comprobación de victoria Columnas
                 if ((((blancoC == 4) || (negroC == 4)) || ((altaC == 4) || (bajaC == 4))) ||
                 (((redondaC == 4) || (cuadradaC == 4)) || ((huecaC == 4) || (rellenaC == 4)))){
-                    for(int ii=1;ii<5;ii++){
-                         pos[ii][j].setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 255, 0), 4, true));
+                    for(int ii=0;ii<4;ii++){
+                         pos[ii][j].setBorder(javax.swing.BorderFactory.createMatteBorder(3, 3, 3, 3, new java.awt.Color(0, 255, 0)));
                     }
-                    System.out.print("QUATRO!");
-                    jLabel1.setText("QUATRO!");
+                    System.out.print(" QUATRO!");
+                    jLabel1.setText(" QUATRO!");
                     System.out.print("Fin del juego, ganador: " + jT);
                     log.setText(jT+ " ha ganado! Fin del juego" + "\n" + "QUATRO!" + log.getText());          
                     estado = 2;
@@ -416,6 +421,7 @@ public class TableroUI extends javax.swing.JFrame {
         pos16.setPreferredSize(new java.awt.Dimension(60, 60));
 
         pos1.setBackground(new java.awt.Color(255, 255, 255));
+        pos1.setBorder(javax.swing.BorderFactory.createMatteBorder(3, 3, 3, 3, new java.awt.Color(153, 153, 0)));
         pos1.setMaximumSize(new java.awt.Dimension(60, 60));
         pos1.setMinimumSize(new java.awt.Dimension(60, 60));
         pos1.setPreferredSize(new java.awt.Dimension(60, 60));
@@ -520,13 +526,13 @@ public class TableroUI extends javax.swing.JFrame {
         );
 
         nombreJuego.setFont(new java.awt.Font("Arial", 1, 30)); // NOI18N
-        nombreJuego.setForeground(new java.awt.Color(51, 51, 255));
+        nombreJuego.setForeground(new java.awt.Color(0, 51, 102));
         nombreJuego.setText("ESTADO:");
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 1, 26)); // NOI18N
 
         jLabel2.setFont(new java.awt.Font("Impact", 0, 100)); // NOI18N
-        jLabel2.setForeground(new java.awt.Color(51, 51, 255));
+        jLabel2.setForeground(new java.awt.Color(0, 51, 102));
         jLabel2.setText("QUATRO!");
 
         log.setEditable(false);
@@ -541,7 +547,7 @@ public class TableroUI extends javax.swing.JFrame {
         jScrollPane1.setViewportView(log);
 
         nombreJuego1.setFont(new java.awt.Font("Arial", 1, 30)); // NOI18N
-        nombreJuego1.setForeground(new java.awt.Color(51, 51, 255));
+        nombreJuego1.setForeground(new java.awt.Color(0, 51, 102));
         nombreJuego1.setText("TURNO:");
 
         turno.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
@@ -559,7 +565,7 @@ public class TableroUI extends javax.swing.JFrame {
 
         textj1.setBackground(new java.awt.Color(204, 204, 0));
         textj1.setFont(new java.awt.Font("Arial", 1, 36)); // NOI18N
-        textj1.setForeground(new java.awt.Color(0, 0, 255));
+        textj1.setForeground(new java.awt.Color(0, 51, 102));
         textj1.setToolTipText("");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
