@@ -139,7 +139,6 @@ public class Tablero extends Agent{
     public void comenzarTurno(){ 
         gui.log.setText("--------------------------------------------------------------" +"\n " + gui.log.getText()); 
         if(ganador != null){
-            //JOptionPane.showMessageDialog(null,ganador.getJugador().getLocalName() + " HA GANADO!");
             ganador = null;
             saveFicha = null;
             movAnterior = null;
@@ -147,7 +146,6 @@ public class Tablero extends Agent{
             j1 = false;
             j2 = false;
             gui.reset();
-            System.out.print("REINICIANDO\n");
             this.addBehaviour(new BuscarJugadores());
         }else{
         for(int i=0;i<4;i++){
@@ -162,7 +160,7 @@ public class Tablero extends Agent{
                     } catch (InterruptedException ex) {
                         Logger.getLogger(Tablero.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                    //JOptionPane.showMessageDialog(null,"EMPATE EN LA PARTIDA!");
+                    JOptionPane.showMessageDialog(null,"EMPATE EN LA PARTIDA!");
                     turno = 0;
                     gui.reset();
                     ganador = null;
@@ -248,7 +246,9 @@ public class Tablero extends Agent{
                             movimiento = mensaje.createReply(); 
                             if(fe.getVictoria().isVictoria()){
                                 gui.log.setText(gui.jE+ " ha pedido comprobación de victoria.\n " + gui.log.getText()); 
-                                ganador = participantes[turno];
+                                if(turno == 0) ganador = participantes[1];
+                                else ganador = participantes[0];
+                                
                             }
                         }
 
@@ -309,9 +309,11 @@ public class Tablero extends Agent{
                 Boolean vic = false;
                 if(ganador != null) vic=true;
                 gui.movimiento(fe.getMovimiento().getPosicion().getFila(), fe.getMovimiento().getPosicion().getColumna(), f, vic);
+                gui.fichaSave.setIcon(null);
                 movAnterior = fe.getMovimiento();
                 if(fe.getVictoria().isVictoria()){ 
-                    ganador = participantes[turno];
+                    if(turno == 0) ganador = participantes[1];
+                    else ganador = participantes[0];
                 }
                 
             } 
@@ -322,8 +324,6 @@ public class Tablero extends Agent{
             }
             if(ganador != null){
                 if(!gui.compruebaGanador()){ 
-                    if(turno == 0) turno = 1;
-                    else turno = 0;
                     ganador = participantes[turno];
                 }
                 ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
@@ -336,7 +336,7 @@ public class Tablero extends Agent{
                 } catch (Codec.CodecException | OntologyException ex) {
                     Logger.getLogger(Tablero.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                JOptionPane.showMessageDialog(null,ganador.getJugador().getLocalName() + " FIN!");
+                JOptionPane.showMessageDialog(null,ganador.getJugador().getLocalName() + " es el ganador!!");
                 send(msg);
             }
             comenzarTurno();
@@ -420,7 +420,8 @@ public class Tablero extends Agent{
         
         @Override
         public boolean done(){
-            return jugadores.length > 1;
+            if(jugadores != null) return  jugadores.length > 1;
+            else return false;
         }
         
         @Override
@@ -431,7 +432,7 @@ public class Tablero extends Agent{
                 reset();
                 myAgent.addBehaviour(this);
             }else{
-                System.out.print("FIN busqueda jugadores \n ");
+                //System.out.print("FIN busqueda jugadores \n ");
                 ACLMessage mensaje = new ACLMessage(ACLMessage.PROPOSE);
                 //mensaje.setProtocol(FIPANames.InteractionProtocol.FIPA_PROPOSE);
                 mensaje.setReplyByDate(new Date(System.currentTimeMillis() + 1000));
@@ -449,9 +450,11 @@ public class Tablero extends Agent{
                     Logger.getLogger(Tablero.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 //Se añade el destinatario.-
-                participantes[0] = new Jugador(jugadores[0].getName());
-                participantes[1] = new Jugador(jugadores[1].getName());
-                System.out.print("J1: " + participantes[0].getJugador().getLocalName() + " J2: " + participantes[1].getJugador().getLocalName() + "\n");
+                do{
+                    participantes[0] = new Jugador(jugadores[0 + (int)(Math.random()*jugadores.length)].getName());
+                    participantes[1] = new Jugador(jugadores[0 + (int)(Math.random()*jugadores.length)].getName());
+                }while(participantes[0].getJugador() == participantes[1].getJugador());
+                //System.out.print("J1: " + participantes[0].getJugador().getLocalName() + " J2: " + participantes[1].getJugador().getLocalName() + "\n");
                 mensaje.addReceiver(participantes[0].getJugador());
                 mensaje.addReceiver(participantes[1].getJugador());
                 try {
@@ -462,7 +465,7 @@ public class Tablero extends Agent{
                 }
                 
                 //Añadir el comportamiento
-                System.out.print("Proponiendo juego \n");
+                //System.out.print("Proponiendo juego \n");
                 myAgent.addBehaviour(new ProponerJuego(myAgent, mensaje));                 
             }
             return 0;

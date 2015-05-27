@@ -60,7 +60,9 @@ public class TableroUI extends javax.swing.JFrame {
     }
     
        public void reset() {
-        
+        jLabel1.setText(" ");
+        turno.setText(" ");
+        textj1.setText(" ");
         fichaSave.setIcon(null);
         log.setText(" ");
         for(int i=0;i<5;i++){
@@ -68,12 +70,12 @@ public class TableroUI extends javax.swing.JFrame {
                 fichas[i][j] = null;
                 if(i<4 && j<4){
                     pos[i][j].setIcon(null);
-                    pos[i][j].setBorder(new javax.swing.border.LineBorder(new java.awt.Color(153, 153, 0), 4, true));
+                    pos[i][j].setBorder(javax.swing.BorderFactory.createMatteBorder(3, 3, 3, 3, new java.awt.Color(153, 153, 0)));
                 }
             }
         }
         estado = 0;
-        jLabel1.setText("Buscando jugadores...");  
+        jLabel1.setText("Buscando...");  
     }
  
 
@@ -227,9 +229,9 @@ public class TableroUI extends javax.swing.JFrame {
                     for(int ii=0;ii<4;ii++){
                          pos[j][ii].setBorder(javax.swing.BorderFactory.createMatteBorder(3, 3, 3, 3, new java.awt.Color(0, 255, 0)));
                     }
-                    System.out.print("QUATRO!");
+                   // System.out.print("QUATRO!");
                     jLabel1.setText("QUATRO!");
-                    System.out.print("Fin del juego, ganador: " + jT);
+                   // System.out.print("Fin del juego, ganador: " + jT);
                     log.setText(jT+ " ha ganado! Fin del juego" + "\n" + "QUATRO!" + "\n " + log.getText());          
                     estado = 2;
                     return true;
@@ -240,9 +242,9 @@ public class TableroUI extends javax.swing.JFrame {
                     for(int ii=0;ii<4;ii++){
                          pos[ii][j].setBorder(javax.swing.BorderFactory.createMatteBorder(3, 3, 3, 3, new java.awt.Color(0, 255, 0)));
                     }
-                    System.out.print(" QUATRO!");
+                    //System.out.print(" QUATRO!");
                     jLabel1.setText(" QUATRO!");
-                    System.out.print("Fin del juego, ganador: " + jT);
+                    //System.out.print("Fin del juego, ganador: " + jT);
                     log.setText(jT+ " ha ganado! Fin del juego" + "\n" + "QUATRO!" + log.getText());          
                     estado = 2;
                     return true;
@@ -260,9 +262,9 @@ public class TableroUI extends javax.swing.JFrame {
                         pos[2][2].setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 255, 0), 4, true));
                         pos[3][3].setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 255, 0), 4, true));
                         pos[0][0].setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 255, 0), 4, true));
-                        System.out.print("QUATRO!");
+                       // System.out.print("QUATRO!");
                         jLabel1.setText("QUATRO!");
-                        System.out.print("Fin del juego, ganador: " + jT);
+                        //System.out.print("Fin del juego, ganador: " + jT);
                         log.setText( jT+ " ha ganado! Fin del juego" + "\n " + "QUATRO!" + log.getText() );          
                         estado = 2;
                         return true; 
@@ -274,9 +276,9 @@ public class TableroUI extends javax.swing.JFrame {
                         pos[2][1].setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 255, 0), 4, true));
                         pos[1][2].setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 255, 0), 4, true));
                         pos[0][3].setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 255, 0), 4, true));
-                         System.out.print("QUATRO!");
+                       //  System.out.print("QUATRO!");
                        jLabel1.setText("QUATRO!");
-                       System.out.print("Fin del juego, ganador: " + jT);
+                     //  System.out.print("Fin del juego, ganador: " + jT);
                        log.setText(jT+ " ha ganado! Fin del juego" + "\n " + "QUATRO!" + log.getText());          
                        estado = 2;
                        return true; 
