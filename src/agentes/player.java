@@ -54,7 +54,6 @@ public class player extends Agent  {
     private Ontology ontologia;
     private Codec codec;
     
-    
     protected void inicializar(){
         fichas[0][0] = "CAHB";
         fichas[1][0] = "CAHN";
