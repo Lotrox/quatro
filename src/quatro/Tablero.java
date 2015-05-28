@@ -45,6 +45,7 @@ import quatro.elementos.MovimientoRealizado;
 import quatro.elementos.Partida;
 import quatro.elementos.PedirFicha;
 import quatro.elementos.PedirMovimiento;
+import quatro.elementos.Victoria;
 
 /**
  *
@@ -282,7 +283,7 @@ public class Tablero extends Agent{
             
             gui.estado = 1;
             try {
-                Thread.sleep(800);
+                Thread.sleep(400);
             } catch (InterruptedException ex) {
                 Logger.getLogger(Tablero.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -308,7 +309,8 @@ public class Tablero extends Agent{
                 quatro.Ficha f = new quatro.Ficha(fi.getColor(), fi.getForma(), fi.getAltura(), fi.getEstado());
                 Boolean vic = false;
                 if(ganador != null) vic=true;
-                gui.movimiento(fe.getMovimiento().getPosicion().getFila(), fe.getMovimiento().getPosicion().getColumna(), f, vic);
+                /*Controlar una victoria falsa*/
+                if(!gui.movimiento(fe.getMovimiento().getPosicion().getFila(), fe.getMovimiento().getPosicion().getColumna(), f, vic)) fe.setVictoria(new Victoria(true));
                 gui.fichaSave.setIcon(null);
                 movAnterior = fe.getMovimiento();
                 if(fe.getVictoria().isVictoria()){ 

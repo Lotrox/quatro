@@ -29,8 +29,6 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.proto.ContractNetResponder;
 import jade.proto.ProposeResponder;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import quatro.Ficha;
@@ -56,23 +54,24 @@ public class player extends Agent  {
     private Ontology ontologia;
     private Codec codec;
     
+    
     protected void inicializar(){
         fichas[0][0] = "CAHB";
-        fichas[1][0] = "CALN";
-        fichas[2][0] = "CAHN";
-        fichas[3][0] = "CALB";
-        fichas[4][0] = "CBHN";
-        fichas[5][0] = "CBLB";
-        fichas[6][0] = "CBHB";
+        fichas[1][0] = "CAHN";
+        fichas[2][0] = "CALB";
+        fichas[3][0] = "CALN";
+        fichas[4][0] = "CBHB";
+        fichas[5][0] = "CBHN";
+        fichas[6][0] = "CBLB";
         fichas[7][0] = "CBLN";
-        fichas[8][0] = "RBHN";
-        fichas[9][0] = "RBLN";
-        fichas[10][0] = "RBHB";
-        fichas[11][0] = "RBLB";
-        fichas[12][0] = "RAHN";
-        fichas[13][0] = "RALB";
-        fichas[14][0] = "RAHB";
-        fichas[15][0] = "RALN";
+        fichas[8][0] = "RBHB";
+        fichas[9][0] = "RBHN";
+        fichas[10][0] = "RBLB";
+        fichas[11][0] = "RBLN";
+        fichas[12][0] = "RBHB";
+        fichas[13][0] = "RBHN";
+        fichas[14][0] = "RBLB";
+        fichas[15][0] = "RBLN";
         for(int i=0;i<16;i++){
             fichas[i][1] = "0";
         }  
@@ -168,20 +167,15 @@ public class player extends Agent  {
     }
     
     protected String selectFicha(){
-        for(int i=0;i<16;i++){
+        int i;
+        do{
+            i = 0 + (int)(Math.random()*15);
             if(fichas[i][1].equals("0")){
-                fichas[i][1] = "1";
+                 fichas[i][1] = "1";
                 return fichas[i][0];
             }
-        }
-        return " ";
-    }
-    protected void registrarFicha(String f){
-        for(int i=0;i<16;i++){
-            if(fichas[i][0].equals(f)){
-                fichas[i][1] = "1";
-            }
-        }
+        }while(fichas[i][1].equals("1"));
+        return "";
     }
 
     
@@ -206,7 +200,7 @@ public class player extends Agent  {
                     Ficha fich = new Ficha(f.getColor(),f.getForma(),f.getAltura(),f.getEstado());
                    // System.out.print("Registrando ficha del movimiento anterior: " + fich.toACL() + "\n");
                     tablero[pedir.getAnterior().getPosicion().getFila()][pedir.getAnterior().getPosicion().getColumna()] = fich;
-                    registrarFicha(fich.toACL());
+                    registrarFicha(fich);
                 }
                     
                 if(!(pedir.getJugadorActivo().getJugador().equals(myAgent.getAID()))){
@@ -225,6 +219,15 @@ public class player extends Agent  {
             }
             return resp;
        }
+        
+        protected void registrarFicha(Ficha fich){
+            for(int i=0;i<16;i++){
+                if(fichas[i][0].equals(fich.toACL()) && fichas[i][1].equals("0")){
+                    fichas[i][1] = "1";
+                }
+            }
+            
+        }
         
         protected Boolean hayVictoria() {
             int blancoF, blancoC, negroF, negroC;
@@ -268,13 +271,13 @@ public class player extends Agent  {
                     //Comprobación de victoria Filas
                     if ((((blancoF == 4) || (negroF == 4)) || ((altaF == 4) || (bajaF == 4))) ||
                     (((redondaF == 4) || (cuadradaF == 4)) || ((huecaF == 4) || (rellenaF == 4)))){
-                        System.out.print("QUATRO! JUGADOR");
+                        System.out.print("QUATRO! JUGADOR\n");
                         return true;
                     } 
                     //Comprobación de victoria Columnas
                     if ((((blancoC == 4) || (negroC == 4)) || ((altaC == 4) || (bajaC == 4))) ||
                     (((redondaC == 4) || (cuadradaC == 4)) || ((huecaC == 4) || (rellenaC == 4)))){
-                        System.out.print("QUATRO! JUGADOR");
+                        System.out.print("QUATRO! JUGADOR\n");
                         return true;
                     }
 
@@ -344,7 +347,7 @@ public class player extends Agent  {
                 Jugador j = fe.getJugador();
                 Posicion p = new Posicion(Integer.parseInt(posxy[0]),Integer.parseInt(posxy[1]));
                 Movimiento m = new Movimiento(fe.getFicha(), p);
-                registrarFicha(fich.toACL());
+                registrarFicha(fich);
                 Victoria v = new Victoria(marcaVictoria);
                 MovimientoRealizado mr = new MovimientoRealizado(j, m);
                 mr.setVictoria(v);

@@ -87,7 +87,7 @@ public class TableroUI extends javax.swing.JFrame {
      * @param f Ficha que deseamos insertar.
      * @param Quatro Marca de victoria.
      */
-    public void movimiento(int x, int y, Ficha f, Boolean Quatro) {
+    public boolean movimiento(int x, int y, Ficha f, Boolean Quatro) {
         if(estado==1){
             jLabel1.setText("Jugando");  
             log.setText(jE+ " ha posicionado la pieza: " +f.toACL() + " en la posición (" + x + ", " + y + ") \n " + log.getText());
@@ -100,6 +100,7 @@ public class TableroUI extends javax.swing.JFrame {
                     log.setText( jT+ " ha ganado por posición ilegal de su rival en  (" + x + ", " + y + ")" + "\n " + log.getText());
                     estado = 2;
                     Logger.getLogger(TableroUI.class.getName()).log(Level.SEVERE, null, ex);
+                    return false;
                 }
             }
 
@@ -111,6 +112,7 @@ public class TableroUI extends javax.swing.JFrame {
                     log.setText( jT+ " ha ganado por posición ilegal de su rival en  (" + x + ", " + y + ")" + "\n " + log.getText());
                     estado = 2;
                     Logger.getLogger(TableroUI.class.getName()).log(Level.SEVERE, null, ex);
+                    return false;
                 }
             }
 
@@ -123,8 +125,9 @@ public class TableroUI extends javax.swing.JFrame {
                             } catch (FichaRepetida ex) {
                                jLabel1.setText("Ganador " + jT);
                                log.setText(jT+ " ha ganado por posición ilegal de su rival en  (" + x + ", " + y + ")" + "\n " + log.getText());
-                               estado = 2;
+                               estado = 2;     
                                Logger.getLogger(TableroUI.class.getName()).log(Level.SEVERE, null, ex);
+                               return false;
                             }
                         }
                     }
@@ -144,6 +147,7 @@ public class TableroUI extends javax.swing.JFrame {
         String aux = jT;
         jT = jE;
         jE = aux;
+        return true;
     }
 
     /**
