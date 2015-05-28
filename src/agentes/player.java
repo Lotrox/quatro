@@ -218,15 +218,14 @@ public class player extends Agent  {
             } catch (Codec.CodecException | OntologyException ex) {
             }
             return resp;
-       }
+        }
         
         protected void registrarFicha(Ficha fich){
             for(int i=0;i<16;i++){
                 if(fichas[i][0].equals(fich.toACL()) && fichas[i][1].equals("0")){
                     fichas[i][1] = "1";
                 }
-            }
-            
+            }    
         }
         
         protected Boolean hayVictoria() {
