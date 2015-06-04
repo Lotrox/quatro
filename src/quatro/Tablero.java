@@ -186,8 +186,6 @@ public class Tablero extends Agent{
         mensajeCFP.setLanguage(codec.getName());
         mensajeCFP.setOntology(ontologia.getName());
         gui.turno.setText(participantes[turno].getJugador().getLocalName());
-        if(turno == 0) turno = 1;
-        else turno = 0; 
         //System.out.println("Jugador activo: " + participantes[turno].getJugador() + "\n");
        PedirFicha pedirFicha = new PedirFicha(partida, participantes[turno], movAnterior);   
        Action a = new Action(getAID(), pedirFicha);
@@ -232,7 +230,9 @@ public class Tablero extends Agent{
                             //System.out.print("Guardando ficha\n");                  
                             saveFicha = fe.getFicha();
                             quatro.Ficha f = new quatro.Ficha(fe.getFicha().getColor(), fe.getFicha().getForma(), fe.getFicha().getAltura(), fe.getFicha().getEstado());
-                            gui.log.setText(gui.jT  + " ha enviado la pieza "+ f.toACL() +"\n " + gui.log.getText());
+                            if(turno == 0) turno = 1;
+                            else turno = 0;
+                            gui.log.setText(participantes[turno].getJugador().getLocalName()  + " ha enviado la pieza "+ f.toACL() +"\n " + gui.log.getText());
                             try {
                                 gui.fichaSave.setIcon(f.pintar());
                             } catch (IOException ex) {
@@ -246,9 +246,9 @@ public class Tablero extends Agent{
                         } else {
                             movimiento = mensaje.createReply(); 
                             if(fe.getVictoria().isVictoria()){
-                                gui.log.setText(gui.jE+ " ha pedido comprobación de victoria.\n " + gui.log.getText()); 
-                                if(turno == 0) ganador = participantes[1];
-                                else ganador = participantes[0];
+                                gui.log.setText(participantes[turno].getJugador().getLocalName() + " ueue ha pedido comprobación de victoria.\n " + gui.log.getText()); 
+                                ganador = participantes[turno];
+                                
                                 
                             }
                         }
@@ -297,8 +297,10 @@ public class Tablero extends Agent{
             Ontology o = myAgent.getContentManager().lookupOntology(OntologiaQuatro.ONTOLOGY_NAME);
             try {
                 fe = (MovimientoRealizado)o.toObject((AbsObject)cs);
+                gui.log.setText(participantes[(turno+1)%2].getJugador().getLocalName() + " ha posicionado en la posicion (" + fe.getMovimiento().getPosicion().getFila() + ", " + fe.getMovimiento().getPosicion().getColumna() + ") \n " + gui.log.getText());
                 if(fe.getVictoria().isVictoria()){
-                    gui.log.setText(gui.jE+ " ha pedido comprobación de victoria.\n " + gui.log.getText());
+                    gui.log.setText(participantes[(turno+1)%2].getJugador().getLocalName()+ " ha pedido comprobación de victoria.\n " + gui.log.getText());
+                    ganador = participantes[turno];
                 }
             } catch (OntologyException ex) {
                 Logger.getLogger(Tablero.class.getName()).log(Level.SEVERE, null, ex);
@@ -308,14 +310,14 @@ public class Tablero extends Agent{
                 quatro.elementos.Ficha fi = fe.getMovimiento().getFicha();
                 quatro.Ficha f = new quatro.Ficha(fi.getColor(), fi.getForma(), fi.getAltura(), fi.getEstado());
                 Boolean vic = false;
-                if(ganador != null) vic=true;
+                if(ganador != null) vic=true; 
                 /*Controlar una victoria falsa*/
                 if(!gui.movimiento(fe.getMovimiento().getPosicion().getFila(), fe.getMovimiento().getPosicion().getColumna(), f, vic)) fe.setVictoria(new Victoria(true));
+                
                 gui.fichaSave.setIcon(null);
                 movAnterior = fe.getMovimiento();
                 if(fe.getVictoria().isVictoria()){ 
-                    if(turno == 0) ganador = participantes[1];
-                    else ganador = participantes[0];
+                    ganador = participantes[(turno+1)%2];
                 }
                 
             } 
@@ -325,9 +327,6 @@ public class Tablero extends Agent{
                 Logger.getLogger(Tablero.class.getName()).log(Level.SEVERE, null, ex);
             }
             if(ganador != null){
-                if(!gui.compruebaGanador()){ 
-                    ganador = participantes[turno];
-                }
                 ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
                 msg.setOntology(ontologia.getName());
                 msg.setLanguage(codec.getName());
@@ -382,6 +381,8 @@ public class Tablero extends Agent{
            System.out.print("Un jugador ha rechazado partida. \n");
            participantes[0] = null;
            participantes[1] = null;
+           j1 = false; j2 = false;
+            addBehaviour( new BuscarJugadores());
         }
     }
     /**
@@ -393,14 +394,14 @@ public class Tablero extends Agent{
         @Override
         public void action() {
             try {
-                Thread.sleep(2000);
+                Thread.sleep(1500);
                 //Buscamos jugadores.
                 DFAgentDescription receptor = new DFAgentDescription();
-                ServiceDescription servicio = new ServiceDescription();
-                servicio.setType(OntologiaQuatro.REGISTRO_JUGADOR);
-               
-                receptor.addServices(servicio);
-                
+                    ServiceDescription servicio = new ServiceDescription();
+                    servicio.setType(OntologiaQuatro.REGISTRO_JUGADOR);
+
+                    receptor.addServices(servicio);
+
                 SearchConstraints sc = new SearchConstraints();
                 //sc.setMaxResults(new Long(4)); /*Busca como máximo 4*/
                 participantes[0] = null;

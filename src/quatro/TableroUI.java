@@ -90,7 +90,7 @@ public class TableroUI extends javax.swing.JFrame {
     public boolean movimiento(int x, int y, Ficha f, Boolean Quatro) {
         if(estado==1){
             jLabel1.setText("Jugando");  
-            log.setText(jE+ " ha posicionado la pieza: " +f.toACL() + " en la posición (" + x + ", " + y + ") \n " + log.getText());
+            
             
             if ((x < 0 || x > 3) || (y < 0 || y > 3)) { //Posición fuera del tablero.
                 try {
@@ -236,7 +236,7 @@ public class TableroUI extends javax.swing.JFrame {
                    // System.out.print("QUATRO!");
                     jLabel1.setText("QUATRO!");
                    // System.out.print("Fin del juego, ganador: " + jT);
-                    log.setText(jT+ " ha ganado! Fin del juego" + "\n" + "QUATRO!" + "\n " + log.getText());          
+                    log.setText(jE+ " ha ganado! Fin del juego" + "\n" + "QUATRO!" + "\n " + log.getText());          
                     estado = 2;
                     return true;
                 } 
@@ -249,7 +249,7 @@ public class TableroUI extends javax.swing.JFrame {
                     //System.out.print(" QUATRO!");
                     jLabel1.setText(" QUATRO!");
                     //System.out.print("Fin del juego, ganador: " + jT);
-                    log.setText(jT+ " ha ganado! Fin del juego" + "\n" + "QUATRO!" + log.getText());          
+                    log.setText(jE+ " ha ganado! Fin del juego" + "\n" + "QUATRO!\n" + log.getText());          
                     estado = 2;
                     return true;
                 }
@@ -269,12 +269,12 @@ public class TableroUI extends javax.swing.JFrame {
                        // System.out.print("QUATRO!");
                         jLabel1.setText("QUATRO!");
                         //System.out.print("Fin del juego, ganador: " + jT);
-                        log.setText( jT+ " ha ganado! Fin del juego" + "\n " + "QUATRO!" + log.getText() );          
+                        log.setText( jE+ " ha ganado! Fin del juego" + "\n " + "QUATRO!\n" + log.getText() );          
                         estado = 2;
                         return true; 
                     }       
                 }
-                if((fichas[3][0] != null) && (fichas[2][1] != null) && (fichas[1][2] != null) && (fichas[0][4] != null)){
+                if((fichas[3][0] != null) && (fichas[2][1] != null) && (fichas[1][2] != null) && (fichas[0][3] != null)){
                     if  ((fichas[3][0].carac[i] == fichas[2][1].carac[i]) && (fichas[1][2].carac[i] == fichas[0][3].carac[i]) && (fichas[3][0].carac[i] == fichas[1][2].carac[i])){
                         pos[3][0].setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 255, 0), 4, true));
                         pos[2][1].setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 255, 0), 4, true));
@@ -283,7 +283,7 @@ public class TableroUI extends javax.swing.JFrame {
                        //  System.out.print("QUATRO!");
                        jLabel1.setText("QUATRO!");
                      //  System.out.print("Fin del juego, ganador: " + jT);
-                       log.setText(jT+ " ha ganado! Fin del juego" + "\n " + "QUATRO!" + log.getText());          
+                       log.setText(jE+ " ha ganado! Fin del juego" + "\n " + "QUATRO!\n" + log.getText());          
                        estado = 2;
                        return true; 
                     }

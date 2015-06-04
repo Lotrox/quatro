@@ -289,7 +289,7 @@ public class player extends Agent  {
                             return true; 
                         }       
                     }
-                    if((tablero[3][0] != null) && (tablero[2][1] != null) && (tablero[1][2] != null) && (tablero[0][4] != null)){
+                    if((tablero[3][0] != null) && (tablero[2][1] != null) && (tablero[1][2] != null) && (tablero[0][3] != null)){
                         if  ((tablero[3][0].carac[i] == tablero[2][1].carac[i]) && (tablero[1][2].carac[i] == tablero[0][3].carac[i]) && (tablero[3][0].carac[i] == tablero[1][2].carac[i])){
                            return true; 
                         }
